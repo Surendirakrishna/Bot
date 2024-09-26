@@ -1,0 +1,87 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext
+import os
+from datetime import datetime
+import bot
+# import gem # Commenting out gem for now as it seems undefined
+
+# Replace 'YOUR_TOKEN' with your actual bot token
+scr = ApplicationBuilder().token("7933555455:AAE5x7TqhFQqLcFRaJEzl0U4NPjd_8Q5m_E").build()
+
+history_file_path = "history.txt"
+
+# Ensure the history file exists
+if not os.path.exists(history_file_path):
+    with open(history_file_path, 'w') as file:
+        pass
+
+def log_to_history(user, user_input, bot_response, file_path):
+    with open(file_path, 'a') as file:
+        file.write(f"{user}: {user_input}\n")
+        file.write(f"Bot: {bot_response}\n")
+        file.write("\n")
+
+def chatbot_response(user_input):
+    return f"I received: {user_input}"
+
+# Command handler for the /start command
+async def new(update: Update, context: CallbackContext):
+    await update.message.reply_text("Hola Amigo! I'm Divine, Suren's personal assistant, HOW CAN I HELP YOU TODAY?")
+
+# Handle text messages
+async def letter(update: Update, context: CallbackContext):
+    user = update.effective_user
+    user_name = user.first_name
+    user_id = user.id
+    user_message = update.message.text
+
+    # Simulating gem chat response
+    source = bot.chat(user_message)
+    # For now, simulating a response
+
+    print(f"[{user_name}, {user_id}]: {user_message}\n\nDivine: {source}\n")
+    
+    user_info = f"[{user_name}] [{user_id}] [{datetime.now()}]"
+    log_to_history(user_info, user_message, source, history_file_path)
+
+    await update.message.reply_text(source)
+
+# Command handler for the /stop command
+async def stop(update: Update, context: CallbackContext):
+    print("Oops... Try again later sometime")
+    quit()
+
+# Command handler for a custom response
+async def respon(update: Update, context: CallbackContext):
+    await update.message.reply_text("Haha I'm Back bbie")
+    # gem.modle.start_chat(history=[]) # Commented out as gem is undefined
+
+# Handle errors in updates
+async def handle_update(update: Update, context: CallbackContext):
+    user_data = context.user_data
+    # Handle user updates
+
+def main():
+    print("Chatbot started.")
+    while True:
+        user_input = input()
+        if user_input.lower() == 'exit':
+            print("Session ended.")
+            break
+
+        bot_response = chatbot_response(user_input)
+        print(f"Bot: {bot_response}")
+
+# Add command handlers
+scr.add_handler(CommandHandler("start", new))
+scr.add_handler(CommandHandler("stop", stop))
+scr.add_handler(CommandHandler("new", respon))
+scr.add_handler(MessageHandler(filters.TEXT, letter))
+
+# Start polling for updates
+scr.run_polling()
+print("BOT ONLINE")
+
+# Running the bot in main
+if __name__ == "__main__":
+    main()

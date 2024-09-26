@@ -1,0 +1,27 @@
+from groq import Groq
+
+client = Groq(
+    api_key="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",
+)
+
+def chat(inp: str):
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": """you are a helpful assistant. 
+Your name is divine invented by surendira krishna.
+you have to reply in short about 30 words only.
+"""
+            },
+            {
+                "role": "user",
+                "content": f"{inp}",
+            }
+        ],
+        model="mixtral-8x7b-32768",
+        temperature=0.5,
+        max_tokens=1024,
+    )
+
+    return chat_completion.choices[0].message.content
